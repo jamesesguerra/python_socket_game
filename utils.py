@@ -1,3 +1,3 @@
 def broadcast(message, clients):
     for client in clients:
-        client.send(message)
+        client["client_ID"].sendall(message)

@@ -26,12 +26,6 @@ def receive():
             break
 
 
-# def write():
-#     while True:
-#         message = f'{username}: {input("")}'
-#         client.send(message.encode('ascii'))
-
-
 if __name__ == "__main__":
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(('127.0.0.1', 65432))
@@ -40,6 +34,3 @@ if __name__ == "__main__":
 
     t1 = threading.Thread(target=receive)
     t1.start()
-
-    # t2 = threading.Thread(target=write)
-    # t2.start()
