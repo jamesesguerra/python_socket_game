@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import concurrent.futures
+import random
 import time
 
 from utils import broadcast
@@ -26,9 +27,6 @@ def check_for_winner(choices, clients):
     player2 = clients[1]["username"]
     player1_choice = choices[0]
     player2_choice = choices[1]
-
-    print(player1_choice)
-    print(player2_choice)
 
     if player1_choice == player2_choice:
         choices.clear()
@@ -72,6 +70,7 @@ def rock_paper_scissors(clients):
     winner = None
 
     while winner is None:
+        time.sleep(0.5)
         broadcast("RPS".encode("ascii"), clients)
         with concurrent.futures.ThreadPoolExecutor() as executor:
             results = executor.map(handle_choice, clients)
@@ -81,10 +80,51 @@ def rock_paper_scissors(clients):
 
 
 # number guessing game
+def guess(client, clients, num):
+    time.sleep(0.5)
+    client["client_ID"].sendall("NUM".encode("ascii"))
+    return check_guess(client, clients, num)
+
+
+def check_guess(client, clients, num):
+    try:
+        guess = int(client["client_ID"].recv(1024).decode("ascii"))
+        
+        if guess < num:
+            broadcast(f"{client['username']}'s guess is too low."
+                .encode("ascii"), clients)
+        elif guess > num:
+            broadcast(f"{client['username']}'s guess is too high."
+                .encode("ascii"), clients)
+        else:
+            broadcast(f"{client['username']} guessed the number {num} correctly!"
+                .encode("ascii"), clients)
+            return 1
+    except:
+        client["client_ID"].close()
+
+
 def guessing_game(winner, clients):
-    print(f"Congrats {winner['username']}")
+    player1 = clients[0] if clients[0] == winner else clients[1]
+    player2 = clients[0] if clients[0] != winner else clients[1]
+
+    random_num = random.randint(1, 100)
+    broadcast("\nI'm guessing a number between 1 and 100...".encode("ascii"), clients)
+
+    winner = None
+    while winner is None:
+        player2["client_ID"].sendall(f"\n{player1['username']} is guessing..."
+            .encode("ascii"))
+        winner = guess(player1, clients, random_num)
+
+        player1["client_ID"].sendall(f"\n{player2['username']} is guessing..."
+            .encode("ascii"))
+        winner = guess(player2, clients, random_num)
+
+    time.sleep(0.5)
+    broadcast("END".encode("ascii"), clients)
 
 
-def start_game(clients):
+def start(clients):
     winner = rock_paper_scissors(clients)
     guessing_game(winner, clients)

@@ -3,7 +3,7 @@
 import socket
 
 from utils import broadcast
-from games import start_game
+from games import start as start_game
 
 
 def receive():
@@ -19,7 +19,7 @@ def receive():
         client.sendall("\nConnected to the server".encode("ascii"))
 
         if len(clients) < 2:
-            client.sendall("\n\nWaiting for another player to join...".encode("ascii"))
+            client.sendall("\nWaiting for another player to join...".encode("ascii"))
         else:
             start_game(clients)
 

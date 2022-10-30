@@ -5,11 +5,12 @@ import threading
 
 
 def receive():
-    while True:
+    end = False
+    while not end:
         try:
             message = client.recv(1024).decode("ascii")
             
-            # server asking for username
+            # username
             if message == "USER":
                 client.sendall(username.encode("ascii"))
             
@@ -18,10 +19,18 @@ def receive():
                 user_action = input("\nEnter a choice (rock, paper, or scissors): ")
                 client.sendall(user_action.encode("ascii"))
 
+            # number guessing game
+            elif message == "NUM":
+                user_guess = input("\nEnter a number between 1 and 100: ")
+                client.sendall(user_guess.encode("ascii"))
+
+            # game end
+            elif message == "END":
+                end = True
+                
             else:
                 print(message)
         except:
-            print('An error occured')
             client.close()
             break
 
