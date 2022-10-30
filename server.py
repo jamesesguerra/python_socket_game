@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+
 import socket
 import threading
 
 from utils import broadcast
-from games import rock_paper_scissors
+from games import start_game
 
 
 def handle(client):
@@ -21,23 +23,20 @@ def receive():
         client, addr = server.accept()
         print(f"Established connection with {str(addr)}")
         
-        client.send("USER".encode("ascii"))
+        client.sendall("USER".encode("ascii"))
         username = client.recv(1024).decode("ascii")
         clients.append(client)
+        usernames.append(username)
 
         broadcast(f"{username} joined.".encode("ascii"), clients)
-        client.send("\nConnected to the server".encode("ascii"))
+        client.sendall("\nConnected to the server".encode("ascii"))
 
         if len(clients) < 2:
-            client.send("\n\nNeed one more player!".encode("ascii"))
+            client.sendall("\n\nWaiting for another player to join...".encode("ascii"))
         else:
-            broadcast("\n\nStarting game...\n".encode("ascii"), clients)
+            # broadcast("\n\nStarting game...\n".encode("ascii"), clients)
 
-            rock_paper_scissors(clients)
-
-
-        t = threading.Thread(target=handle, args=(client,))
-        t.start()
+            start_game(clients, usernames)
 
 
 if __name__ == "__main__":
@@ -49,6 +48,7 @@ if __name__ == "__main__":
     server.listen()
 
     clients = []
+    usernames = []
 
     print(f"Server listening on port {port}...")
     receive()
