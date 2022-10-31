@@ -19,7 +19,8 @@ def receive():
         client.sendall("\nConnected to the server".encode("ascii"))
 
         if len(clients) < 2:
-            client.sendall("\nWaiting for another player to join...".encode("ascii"))
+            client.sendall("\nWaiting for another player to join..."
+                .encode("ascii"))
         else:
             start_game(clients)
 

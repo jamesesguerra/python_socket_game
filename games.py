@@ -68,7 +68,6 @@ def check_for_winner(choices, clients):
 
 def rock_paper_scissors(clients):
     winner = None
-
     while winner is None:
         time.sleep(0.5)
         broadcast("RPS".encode("ascii"), clients)
@@ -91,15 +90,16 @@ def check_guess(client, clients, num):
         guess = int(client["client_ID"].recv(1024).decode("ascii"))
         
         if guess < num:
-            broadcast(f"{client['username']}'s guess is too low."
+            broadcast(f"{client['username']}'s guess ({guess}) is too low."
                 .encode("ascii"), clients)
         elif guess > num:
-            broadcast(f"{client['username']}'s guess is too high."
+            broadcast(f"{client['username']}'s guess ({guess}) is too high."
                 .encode("ascii"), clients)
         else:
-            broadcast(f"{client['username']} guessed the number {num} correctly!"
+            broadcast(f"{client['username']} guessed the number {num} correctly! \
+                \nThank you for playing."
                 .encode("ascii"), clients)
-            return 1
+            return client
     except:
         client["client_ID"].close()
 
@@ -109,17 +109,19 @@ def guessing_game(winner, clients):
     player2 = clients[0] if clients[0] != winner else clients[1]
 
     random_num = random.randint(1, 100)
+    print(random_num)
     broadcast("\nI'm guessing a number between 1 and 100...".encode("ascii"), clients)
 
-    winner = None
-    while winner is None:
+    while True:
         player2["client_ID"].sendall(f"\n{player1['username']} is guessing..."
             .encode("ascii"))
         winner = guess(player1, clients, random_num)
+        if winner: break
 
         player1["client_ID"].sendall(f"\n{player2['username']} is guessing..."
             .encode("ascii"))
         winner = guess(player2, clients, random_num)
+        if winner: break
 
     time.sleep(0.5)
     broadcast("END".encode("ascii"), clients)
