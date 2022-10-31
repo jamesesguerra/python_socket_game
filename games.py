@@ -13,7 +13,10 @@ choices = []
 def handle_choice(client):
     try:
         client_choice = client["client_ID"].recv(1024).decode("ascii")
-        choices.append(client_choice)
+        choices.append({ 
+            "client_choice": client_choice, 
+            "username": client["username"] 
+        })
         client["client_ID"] \
             .sendall(f"You chose {client_choice}, waiting for results..."
             .encode("ascii"))
@@ -25,8 +28,10 @@ def handle_choice(client):
 def check_for_winner(choices, clients):
     player1 = clients[0]["username"]
     player2 = clients[1]["username"]
-    player1_choice = choices[0]
-    player2_choice = choices[1]
+    player1_choice = choices[0]["client_choice"] \
+        if choices[0]["username"] == player1 else choices[1]["client_choice"]
+    player2_choice = choices[0]["client_choice"] \
+        if choices[0]["username"] != player1 else choices[1]["client_choice"]
 
     if player1_choice == player2_choice:
         choices.clear()
@@ -69,6 +74,8 @@ def check_for_winner(choices, clients):
 def rock_paper_scissors(clients):
     winner = None
     while winner is None:
+        broadcast("\nStarting a game of rock paper scissors to decide who guesses first..."
+            .encode("ascii"), clients)
         time.sleep(0.5)
         broadcast("RPS".encode("ascii"), clients)
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -109,7 +116,8 @@ def guessing_game(winner, clients):
     player2 = clients[0] if clients[0] != winner else clients[1]
 
     random_num = random.randint(1, 100)
-    broadcast("\nI'm guessing a number between 1 and 100...".encode("ascii"), clients)
+    broadcast("\nI'm thinking of a number between 1 and 100..."
+        .encode("ascii"), clients)
 
     while True:
         player2["client_ID"].sendall(f"\n{player1['username']} is guessing..."
