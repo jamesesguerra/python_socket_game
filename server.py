@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import socket
 
 from utils import broadcast
@@ -26,15 +27,20 @@ def receive():
 
 
 if __name__ == "__main__":
-    host = ""
-    port = 65432
+    parser = argparse.ArgumentParser(description="Server for guessing game")
+    parser.add_argument("--host", 
+        help="Hosts to accept connections from \
+            (leave blank to accept connections from any host)",
+        default="")
+    parser.add_argument("--port", "-p",
+        help="Port to bind socket to", default=65432)
+    args = parser.parse_args()
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((host, port))
+    server.bind((args.host, int(args.port)))
     server.listen()
 
     clients = []
-
-    print(f"Server listening on port {port}...")
+    print(f"Server listening on port {args.port}...")
     receive()
 
