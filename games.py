@@ -127,6 +127,7 @@ def guessing_game(winner, clients):
     broadcast("END".encode("ascii"), clients)
 
 
+# start
 def start(clients):
     winner = rock_paper_scissors(clients)
     guessing_game(winner, clients)
