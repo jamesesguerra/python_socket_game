@@ -1,7 +1,6 @@
 # socket game for csci70
 
 ## setup
----
 
 ### clone the repo
 ```sh
@@ -19,7 +18,6 @@ chmod +x server.py client.py
 ```
 
 ## usage
----
 
 ### server
 
