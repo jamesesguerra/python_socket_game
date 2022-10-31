@@ -109,7 +109,6 @@ def guessing_game(winner, clients):
     player2 = clients[0] if clients[0] != winner else clients[1]
 
     random_num = random.randint(1, 100)
-    print(random_num)
     broadcast("\nI'm guessing a number between 1 and 100...".encode("ascii"), clients)
 
     while True:

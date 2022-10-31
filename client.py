@@ -17,8 +17,7 @@ def receive():
             
             # rock paper scissors
             elif message == "RPS":
-                user_action = input("\nEnter a choice \
-                    (rock, paper, or scissors): ")
+                user_action = input("\nEnter a choice (rock, paper, or scissors): ")
                 client.sendall(user_action.encode("ascii"))
 
             # number guessing game
